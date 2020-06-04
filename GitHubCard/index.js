@@ -3,7 +3,12 @@
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+// axios.get("https://api.github.com/users/cristina-altreche").then((response) => {
+//   console.log("the response from the API, organized for us by axios", response);
+//   const userObj = response.data.avatar_URL;
 
+//   const userCard = cardMaker();
+// });
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
     github info! You will need to understand the structure of this
@@ -28,7 +33,14 @@
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const followersArray = [
+  "cristina-altreche",
+  "tetondan",
+  "dustinmyers",
+  "justsml",
+  "luishrd",
+  "bigknell",
+];
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -49,6 +61,121 @@ const followersArray = [];
       </div>
     </div>
 */
+let container = document.querySelector(".cards");
+
+function cardCreator(attr) {
+  //elements created
+  let {
+    imageURL,
+    name,
+    userName,
+    userLocation,
+    userURL,
+    followers,
+    following,
+    userBio,
+  } = attr;
+
+  let cardDiv = document.createElement("div");
+  let img = document.createElement("img");
+  let cardInfoDiv = document.createElement("div");
+  let h3 = document.createElement("h3");
+  let pUsername = document.createElement("p");
+  let pLocation = document.createElement("p");
+  let pProfile = document.createElement("p");
+  let aTag = document.createElement("a");
+  let pFollowers = document.createElement("p");
+  let pFollowing = document.createElement("p");
+  let pBio = document.createElement("p");
+
+  //html created
+  cardDiv.appendChild(img);
+  cardDiv.appendChild(cardInfoDiv);
+  cardInfoDiv.appendChild(h3);
+  cardInfoDiv.appendChild(pUsername);
+  cardInfoDiv.appendChild(pLocation);
+  cardInfoDiv.appendChild(pProfile);
+  pProfile.appendChild(aTag);
+  cardInfoDiv.appendChild(pFollowers);
+  cardInfoDiv.appendChild(pFollowing);
+  cardInfoDiv.appendChild(pBio);
+
+  //classes
+  cardDiv.classList.add("card");
+  cardInfoDiv.classList.add("card-info");
+  h3.classList.add("name");
+  pUsername.classList.add("username");
+
+  //content
+  img.src = imageURL;
+  h3.textContent = name;
+  pUsername.textContent = userName;
+  pLocation.textContent = `Location: ${userLocation}`;
+  pProfile.textContent = `Profile: ${userURL}`;
+  aTag.href = userURL;
+  aTag.textContent = userURL;
+  pFollowers.textContent = `Followers: ${followers}`;
+  pFollowing.textContent = `Following: ${following}`;
+  pBio.textContent = `Bio: ${userBio}`;
+
+  return cardDiv;
+}
+
+// TESTING cardCreator function
+// const theTestCard = cardCreator({
+//   imageURL: "www",
+//   name: "Cristina",
+//   userName: "Tina",
+//   userLocation: "Vineland",
+//   userURL: "www2",
+//   followers: "1",
+//   following: "3",
+//   userBio: "ladingaonngadfogna",
+// });
+// console.log("these are elements created with cardMaker", theTestCard);
+function getUsers(followersArray) {
+  let followersArr = followersArray;
+  for (let i = 0; i < followersArr.length; i++) {
+    axios
+      .get(`https://api.github.com/users/${followersArr[i]}`)
+
+      .then((response) => {
+        console.log(
+          "the response from the API, organized for us by axios",
+          response
+        );
+        const imageURL = response.data.avatar_url;
+        const name = response.data.login;
+        const userName = response.data.name;
+        const userLocation = response.data.location;
+        const userURL = response.data.html_url;
+        const followers = response.data.followers;
+        const following = response.data.following;
+        const userBio = response.data.bio;
+        const userObj = {
+          imageURL,
+          name,
+          userName,
+          userLocation,
+          userURL,
+          followers,
+          following,
+          userBio,
+        };
+
+        //Step4 append to DOM from axios
+        const newCard = cardCreator(userObj);
+        container.appendChild(newCard);
+      })
+      .catch((error) => {
+        console.log(
+          "something went wrong, hopefully the error tells us what",
+          error
+        );
+      });
+  }
+}
+getUsers(followersArray);
 
 /*
   List of LS Instructors Github username's:
